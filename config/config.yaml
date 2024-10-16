@@ -1,0 +1,5 @@
+app:
+  name: pandora
+  port: 8080
+mysql:
+  dns: "root:root@tcp(112.124.62.35:3306)/pandora"
