@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"time"
 
 	"github.com/lcsin/pandora/internal/domain"
 	"github.com/lcsin/pandora/internal/repository/dao"
@@ -55,8 +56,8 @@ func (ur *UserRepository) GetByEmail(ctx context.Context, email string) (*domain
 		Email:       user.Email,
 		Username:    user.Username,
 		Password:    user.Password,
-		CreatedTime: user.CreatedAt,
-		UpdatedTime: user.UpdatedAt,
+		CreatedTime: user.CreatedAt.Format(time.DateTime),
+		UpdatedTime: user.UpdatedAt.Format(time.DateTime),
 	}, nil
 }
 

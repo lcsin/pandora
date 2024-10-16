@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"time"
 
 	"gorm.io/gorm"
 )
@@ -12,8 +13,8 @@ type User struct {
 	Email     string `gorm:"unique"`
 	Username  string
 	Password  string
-	CreatedAt string
-	UpdatedAt string
+	CreatedAt time.Time
+	UpdatedAt time.Time
 }
 
 // TableName 数据库用户表名映射

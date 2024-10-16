@@ -2,4 +2,4 @@ app:
   name: pandora
   port: 8080
 mysql:
-  dns: "root:root@tcp(112.124.62.35:3306)/pandora"
+  dns: "root:root@tcp(192.168.193.240:3306)/pandora?charset=utf8&parseTime=True&loc=Local&interpolateParams=True"
