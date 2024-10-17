@@ -12,22 +12,25 @@ func _() {
 	_ = x[Failed - -1]
 	_ = x[BadRequest - -400]
 	_ = x[UserNotFound - -1001]
+	_ = x[ErrUserExisted - -1002]
 }
 
 const (
-	_ErrCode_name_0 = "用户不存在或密码错误"
+	_ErrCode_name_0 = "用户已存在用户不存在或密码错误"
 	_ErrCode_name_1 = "参数错误"
 	_ErrCode_name_2 = "unknown errorok"
 )
 
 var (
+	_ErrCode_index_0 = [...]uint8{0, 15, 45}
 	_ErrCode_index_2 = [...]uint8{0, 13, 15}
 )
 
 func (i ErrCode) String() string {
 	switch {
-	case i == -1001:
-		return _ErrCode_name_0
+	case -1002 <= i && i <= -1001:
+		i -= -1002
+		return _ErrCode_name_0[_ErrCode_index_0[i]:_ErrCode_index_0[i+1]]
 	case i == -400:
 		return _ErrCode_name_1
 	case -1 <= i && i <= 0:

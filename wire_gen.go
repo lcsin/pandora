@@ -21,11 +21,12 @@ import (
 //
 //	@return *gin.Engine
 func InitApp() *gin.Engine {
+	webHandler := handler.NewWebHandler()
 	db := ioc.InitDB()
 	iUserDAO := dao.NewUserDAO(db)
 	iUserRepository := repository.NewUserRepository(iUserDAO)
 	iUserService := service.NewUserService(iUserRepository)
 	userHandler := handler.NewUserHandler(iUserService)
-	engine := ioc.InitWebServer(userHandler)
+	engine := ioc.InitWebServer(webHandler, userHandler)
 	return engine
 }

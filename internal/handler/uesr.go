@@ -90,6 +90,11 @@ func (uh *UserHandler) Register(c *gin.Context) {
 		return
 	}
 
+	if len(req.Email) == 0 || len(req.Password) == 0 || len(req.ConfirmPassword) == 0 {
+		api.ResponseError(c, message.BadRequest)
+		return
+	}
+
 	if req.Password != req.ConfirmPassword {
 		api.ResponseErrorMessage(c, message.BadRequest, "密码不一致")
 		return
@@ -99,6 +104,10 @@ func (uh *UserHandler) Register(c *gin.Context) {
 		Email:    req.Email,
 		Password: req.Password,
 	}); err != nil {
+		if errors.Is(err, service.ErrUserExisted) {
+			api.ResponseError(c, message.ErrUserExisted)
+			return
+		}
 		api.ResponseError(c, message.Failed)
 		return
 	}

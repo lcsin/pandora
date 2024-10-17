@@ -5,6 +5,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/go-sql-driver/mysql"
 	"github.com/lcsin/pandora/internal/domain"
 	"github.com/lcsin/pandora/internal/repository"
 	"golang.org/x/crypto/bcrypt"
@@ -14,6 +15,9 @@ import (
 var (
 	// ErrUserNotFound 用户不存在或密码错误
 	ErrUserNotFound = errors.New("用户不存在或密码错误")
+
+	// ErrUserExisted 用户已存在
+	ErrUserExisted = errors.New("用户已存在")
 )
 
 // IUserService UserService Interface
@@ -72,6 +76,13 @@ func (us *UserService) Regiser(ctx context.Context, user domain.User) error {
 
 	user.Password = string(hash)
 	user.CreatedTime = time.Now().Format(time.DateTime)
+	if err = us.repo.Create(ctx, user); err != nil {
+		// 判断邮箱是否已经被注册
+		if mysqlErr, ok := err.(*mysql.MySQLError); ok && mysqlErr.Number == 1062 {
+			return ErrUserExisted
+		}
+		return err
+	}
 
-	return us.repo.Create(ctx, user)
+	return nil
 }

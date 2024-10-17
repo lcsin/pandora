@@ -14,4 +14,6 @@ const (
 
 	// UserNotFound 用户不存在
 	UserNotFound ErrCode = -1001 // 用户不存在或密码错误
+	// ErrUserExisted 用户已存在
+	ErrUserExisted ErrCode = -1002 // 用户已存在
 )

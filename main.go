@@ -10,5 +10,7 @@ import (
 func main() {
 	ioc.InitConfig()
 	r := InitApp()
+	r.LoadHTMLGlob("html/*")
+
 	r.Run(fmt.Sprintf(":%v", viper.Get("app.port")))
 }
