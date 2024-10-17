@@ -17,5 +17,8 @@ func InitWebServer(userHandler *handler.UserHandler) *gin.Engine {
 		c.String(http.StatusOK, "pong")
 	})
 
+	v1 := r.Group("/api/v1")
+	userHandler.RegisterRoutes(v1)
+
 	return r
 }
