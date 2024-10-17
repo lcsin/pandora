@@ -35,7 +35,7 @@ func NewUserRepository(dao dao.IUserDAO) IUserRepository {
 //	@param user
 //	@return error
 func (ur *UserRepository) Create(ctx context.Context, user domain.User) error {
-	return ur.dao.Inser(ctx, user.ToEntity())
+	return ur.dao.Inser(ctx, user.ToDAO())
 }
 
 // GetByEmail 根据email获取用户
@@ -68,5 +68,5 @@ func (ur *UserRepository) GetByEmail(ctx context.Context, email string) (*domain
 //	@param user
 //	@return error
 func (ur *UserRepository) UpdateByID(ctx context.Context, user domain.User) error {
-	return ur.dao.UpdateUserByID(ctx, user.ToEntity())
+	return ur.dao.UpdateUserByID(ctx, user.ToDAO())
 }
