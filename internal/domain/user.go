@@ -16,20 +16,17 @@ type User struct {
 	UpdatedTime string
 }
 
-// ToDAO 转换为数据库的User模型
+// ToEntity 转换为数据库的User模型
 //
 //	@receiver u
 //	@return dao.User
-func (u *User) ToDAO() dao.User {
-	createdAt, _ := time.Parse(time.DateTime, u.CreatedTime)
-	updatedAt, _ := time.Parse(time.DateTime, u.UpdatedTime)
-
+func (u *User) ToEntity() dao.User {
 	return dao.User{
 		ID:        u.ID,
 		Email:     u.Email,
 		Username:  u.Username,
 		Password:  u.Password,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
 	}
 }
