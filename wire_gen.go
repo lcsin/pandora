@@ -21,12 +21,16 @@ import (
 //
 //	@return *gin.Engine
 func InitApp() *gin.Engine {
-	webHandler := handler.NewWebHandler()
 	db := ioc.InitDB()
+	iMusicDAO := dao.NewMusicDAO(db)
+	iMusicRepository := repository.NewMusicRepository(iMusicDAO)
+	iMusicService := service.NewMusicService(iMusicRepository)
+	webHandler := handler.NewWebHandler(iMusicService)
 	iUserDAO := dao.NewUserDAO(db)
 	iUserRepository := repository.NewUserRepository(iUserDAO)
 	iUserService := service.NewUserService(iUserRepository)
 	userHandler := handler.NewUserHandler(iUserService)
-	engine := ioc.InitWebServer(webHandler, userHandler)
+	musicHandler := handler.NewMusicHandler(iMusicService)
+	engine := ioc.InitWebServer(webHandler, userHandler, musicHandler)
 	return engine
 }

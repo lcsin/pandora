@@ -21,6 +21,8 @@ func InitApp() *gin.Engine {
 		ioc.InitDB, ioc.InitWebServer, handler.NewWebHandler,
 		// 用户服务
 		dao.NewUserDAO, repository.NewUserRepository, service.NewUserService, handler.NewUserHandler,
+		// 音乐服务
+		dao.NewMusicDAO, repository.NewMusicRepository, service.NewMusicService, handler.NewMusicHandler,
 	)
 
 	return gin.Default()

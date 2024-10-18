@@ -17,7 +17,7 @@ type User struct {
 	UpdatedAt time.Time
 }
 
-// TableName 数据库用户表名映射
+// TableName 数据库用户表表名映射
 func (u *User) TableName() string {
 	return "user_tbl"
 }

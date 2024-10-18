@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音乐播放器</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            overflow-y: auto;
+            min-width: 200px;
+            max-width: 50%;
+        }
+
+        .divider {
+            width: 5px;
+            background-color: #34495e;
+            cursor: col-resize;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            min-width: 400px;
+        }
+
+        .search-bar {
+            padding: 20px;
+            background-color: #34495e;
+        }
+
+        .song-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .player {
+            height: 100px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #3498db;
+        }
+
+        ul {
+            list-style-type: none;
+        }
+
+        li {
+            padding: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        li:hover {
+            background-color: #34495e;
+            padding-left: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        th {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 20px;
+            background-color: #ecf0f1;
+            color: #2c3e50;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .now-playing {
+            font-size: 14px;
+            flex-grow: 1;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #34495e;
+            height: 5px;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        .progress {
+            width: 0%;
+            height: 100%;
+            background-color: #3498db;
+            transition: width 0.1s linear;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>我的歌单</h2>
+        <ul>
+            <li>💖 最爱</li>
+            <li>🎵 流行</li>
+            <li>🍃 轻音乐</li>
+            <li>🎻 古典</li>
+            <li>🎸 摇滚</li>
+        </ul>
+    </div>
+    <div class="divider" id="divider"></div>
+    <div class="main-content">
+        <div class="search-bar">
+            <input type="text" placeholder="搜索音乐...">
+        </div>
+        <div class="song-list">
+            <table>
+                <tr>
+                    <th>歌曲</th>
+                    <th>歌手</th>
+                    <th>时长</th>
+                </tr>
+                {{range.}}
+                <tr>
+                    <td>{{.Name}}</td>
+                    <td>{{.Author}}</td>
+                    <td>{{.Time}}</td>
+                </tr>
+                {{end}}
+            </table>
+        </div>
+        <div class="player">
+            <div class="now-playing">
+                <strong>正在播放：</strong>
+                <span id="current-song">未选择歌曲</span>
+                <div class="progress-bar" id="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+            </div>
+            <div class="player-controls">
+                <button id="prev-button">⏮️</button>
+                <button id="play-pause-button">▶️</button>
+                <button id="next-button">⏭️</button>
+            </div>
+            <div id="time-display">0:00 / 0:00</div>
+        </div>
+    </div>
+
+    <audio id="audio-player"></audio>
+
+    <script>
+        // 分割线拖动功能
+        const divider = document.getElementById('divider');
+        const sidebar = document.querySelector('.sidebar');
+        let isDragging = false;
+
+        divider.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+        });
+
+        function drag(e) {
+            if (isDragging) {
+                const containerWidth = document.body.clientWidth;
+                const newWidth = e.clientX;
+
+                if (newWidth >= 200 && newWidth <= containerWidth / 2) {
+                    sidebar.style.width = newWidth + 'px';
+                }
+            }
+        }
+
+        function stopDrag() {
+            isDragging = false;
+            document.removeEventListener('mousemove', drag);
+            document.removeEventListener('mouseup', stopDrag);
+        }
+
+        // 音频播放功能
+        const audioPlayer = document.getElementById('audio-player');
+        const playPauseButton = document.getElementById('play-pause-button');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const progressBar = document.getElementById('progress-bar');
+        const progress = document.getElementById('progress');
+        const timeDisplay = document.getElementById('time-display');
+        const currentSongDisplay = document.getElementById('current-song');
+
+        // 从后端获取音乐列表
+        let playlist = []
+        getMusicList()
+        function getMusicList() {
+            const uid = 2
+            fetch('http://localhost:8080/api/v1/music/list', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ uid })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    playlist = data.data.map(item => ({ title: item.name + " - " + item.author, url: item.url }))
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // 示例播放列表
+        // const playlist = [
+        //     { title: "Shape of You - Ed Sheeran", url: "../static/test1.ogg" },
+        //     { title: "Blinding Lights - The Weeknd", url: "../static/test2.mp3" },
+        //     { title: "Dance Monkey - Tones and I", url: "../static/test3.mp3" }
+        // ];
+        let currentTrack = 0;
+
+        function loadTrack(trackIndex) {
+            if (trackIndex >= 0 && trackIndex < playlist.length) {
+                currentTrack = trackIndex;
+                audioPlayer.src = playlist[currentTrack].url;
+                currentSongDisplay.textContent = playlist[currentTrack].title;
+                audioPlayer.play();
+                playPauseButton.textContent = "⏸️";
+            }
+        }
+
+        playPauseButton.addEventListener('click', () => {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                playPauseButton.textContent = "⏸️";
+            } else {
+                audioPlayer.pause();
+                playPauseButton.textContent = "▶️";
+            }
+        });
+
+        prevButton.addEventListener('click', () => {
+            loadTrack(currentTrack - 1);
+        });
+
+        nextButton.addEventListener('click', () => {
+            loadTrack(currentTrack + 1);
+        });
+
+        progressBar.addEventListener('click', (e) => {
+            const clickPosition = (e.pageX - progressBar.offsetLeft) / progressBar.offsetWidth;
+            audioPlayer.currentTime = clickPosition * audioPlayer.duration;
+        });
+
+        audioPlayer.addEventListener('timeupdate', () => {
+            const currentTime = audioPlayer.currentTime;
+            const duration = audioPlayer.duration;
+            const progressPercent = (currentTime / duration) * 100;
+            progress.style.width = `${progressPercent}%`;
+
+            const formatTime = (time) => {
+                const minutes = Math.floor(time / 60);
+                const seconds = Math.floor(time % 60).toString().padStart(2, '0');
+                return `${minutes}:${seconds}`;
+            };
+
+            timeDisplay.textContent = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+        });
+
+        audioPlayer.addEventListener('ended', () => {
+            loadTrack(currentTrack + 1);
+        });
+
+        // 初始加载第一首歌
+        loadTrack(0);
+
+        // 为歌曲列表添加点击事件
+        document.querySelectorAll('.song-list table tr:not(:first-child)').forEach((row, index) => {
+            row.addEventListener('dblclick', () => {
+                loadTrack(index);
+            });
+        });
+    </script>
+</body>
+
+</html>

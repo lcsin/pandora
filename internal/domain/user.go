@@ -8,12 +8,12 @@ import (
 
 // User domain.User
 type User struct {
-	ID          int64
-	Email       string
-	Username    string
-	Password    string
-	CreatedTime string
-	UpdatedTime string
+	ID          int64  `json:"id,omitempty"`
+	Email       string `json:"email,omitempty"`
+	Username    string `json:"username,omitempty"`
+	Password    string `json:"password,omitempty"`
+	CreatedTime string `json:"created_time,omitempty"`
+	UpdatedTime string `json:"updated_time,omitempty"`
 }
 
 // ToDAO 转换为数据库的User模型

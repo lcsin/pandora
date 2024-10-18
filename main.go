@@ -10,7 +10,7 @@ import (
 func main() {
 	ioc.InitConfig()
 	r := InitApp()
-	r.LoadHTMLGlob("html/*")
+	// web.RegisterRoutes(r) // 注册前端页面路由
 
 	r.Run(fmt.Sprintf(":%v", viper.Get("app.port")))
 }
