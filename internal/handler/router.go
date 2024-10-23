@@ -54,10 +54,10 @@ func (wh *WebHandler) Register(c *gin.Context) {
 //	@param c
 func (wh *WebHandler) Index(c *gin.Context) {
 	type Music struct {
-		Name   string `json:"name"`
-		Author string `json:"author"`
-		Time   string `json:"time"`
-		URL    string `json:"url"`
+		Name   string  `json:"name"`
+		Author string  `json:"author"`
+		Time   float64 `json:"time"`
+		URL    string  `json:"url"`
 	}
 
 	// music := []Music{

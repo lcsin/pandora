@@ -8,7 +8,15 @@ import (
 
 // IMusicDAO music dao interface
 type IMusicDAO interface {
+	SelectMusicInfoByID(ctx context.Context, ID int64) (*Music, error)
+
 	SelectMusicListByUID(ctx context.Context, uid int64) ([]*Music, error)
+
+	SelectMusicByNameOrAuthor(ctx context.Context, name, author string) ([]*Music, error)
+
+	InsertMusics(ctx context.Context, musics []Music) error
+
+	UpdateMusicInfo(ctx context.Context, music Music) error
 }
 
 // Music 数据库音乐表实体映射
@@ -18,7 +26,7 @@ type Music struct {
 	Name   string
 	Author string
 	URL    string
-	Time string
+	Time   float64
 }
 
 // TableName 数据库音乐表表名映射
@@ -42,7 +50,22 @@ func NewMusicDAO(db *gorm.DB) IMusicDAO {
 	return &MusicDAO{db: db}
 }
 
-// SelectMusicListByID 根据用户ID获取音乐列表
+// SelectMusicInfoByID 根据ID获取音乐信息
+//
+//	@receiver m
+//	@param ctx
+//	@param ID
+//	@return *Music
+//	@return error
+func (m *MusicDAO) SelectMusicInfoByID(ctx context.Context, ID int64) (*Music, error) {
+	var music Music
+	if err := m.db.Where("id = ?", ID).First(&music).Error; err != nil {
+		return nil, err
+	}
+	return &music, nil
+}
+
+// SelectMusicListByUID 根据用户ID获取音乐列表
 //
 //	@receiver m
 //	@param ctx
@@ -55,4 +78,49 @@ func (m *MusicDAO) SelectMusicListByUID(ctx context.Context, uid int64) ([]*Musi
 		return nil, err
 	}
 	return music, nil
+}
+
+// SelectMusicByNameOrAuthor 根据歌名或作者名获取音乐列表
+//
+//	@receiver m
+//	@param ctx
+//	@param name
+//	@param author
+//	@return []*Music
+//	@return error
+func (m *MusicDAO) SelectMusicByNameOrAuthor(ctx context.Context, name, author string) ([]*Music, error) {
+	var music []*Music
+	if err := m.db.Where("`name` = ? or author = ?", name, author).Find(&music).Error; err != nil {
+		return nil, err
+	}
+	return music, nil
+}
+
+// InsertMusics 新增音乐
+//
+//	@receiver m
+//	@param ctx
+//	@param music
+//	@return error
+func (m *MusicDAO) InsertMusics(ctx context.Context, musics []Music) error {
+	if len(musics) > 0 {
+		return m.db.Create(&musics).Error
+	}
+	return nil
+}
+
+// UpdateMusicInfo 更新音乐信息
+//
+//	@receiver m
+//	@param ctx
+//	@param music
+//	@return error
+func (m *MusicDAO) UpdateMusicInfo(ctx context.Context, music Music) error {
+	if err := m.db.Model(&Music{}).Where("id = ?", music.ID).Updates(map[string]interface{}{
+		"name":   music.Name,
+		"author": music.Author,
+	}).Error; err != nil {
+		return err
+	}
+	return nil
 }

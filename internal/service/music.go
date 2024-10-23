@@ -2,14 +2,30 @@ package service
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/lcsin/pandora/internal/domain"
 	"github.com/lcsin/pandora/internal/repository"
+	"gorm.io/gorm"
+)
+
+var (
+	// ErrMusicFound 音乐不存在
+	ErrMusicFound = errors.New("音乐不存在")
 )
 
 // IMusicService 音乐Service层接口
 type IMusicService interface {
+	GetMusicInfoByID(ctx context.Context, ID int64) (*domain.Music, error)
+
 	GetMusicListByUID(ctx context.Context, uid int64) ([]*domain.Music, error)
+
+	GetMusicListByNameOrAuthor(ctx context.Context, name, author string) ([]*domain.Music, error)
+
+	AddMusics(ctx context.Context, musics []*domain.Music) error
+
+	UpdateMusicInfo(ctx context.Context, music *domain.Music) error
 }
 
 // MusicService music service
@@ -25,6 +41,17 @@ func NewMusicService(repo repository.IMusicRepository) IMusicService {
 	return &MusicService{repo: repo}
 }
 
+// GetMusicInfoByID 根据ID获取音乐信息
+//
+//	@receiver ms
+//	@param ctx
+//	@param ID
+//	@return *domain.Music
+//	@return error
+func (ms *MusicService) GetMusicInfoByID(ctx context.Context, ID int64) (*domain.Music, error) {
+	return ms.repo.GetMusicInfoByID(ctx, ID)
+}
+
 // GetMusicListByUID 根据用户id获取音乐列表
 //
 //	@receiver ms
@@ -34,4 +61,54 @@ func NewMusicService(repo repository.IMusicRepository) IMusicService {
 //	@return error
 func (ms *MusicService) GetMusicListByUID(ctx context.Context, uid int64) ([]*domain.Music, error) {
 	return ms.repo.GetMusicListByUID(ctx, uid)
+}
+
+// GetMusicListByNameOrAuthor 根据歌名或作者获取音乐列表
+//
+//	@receiver ms
+//	@param ctx
+//	@param name
+//	@param author
+//	@return []*domain.Music
+//	@return error
+func (ms *MusicService) GetMusicListByNameOrAuthor(ctx context.Context, name, author string) ([]*domain.Music, error) {
+	return ms.repo.GetMusicListByNameOrAuthor(ctx, name, author)
+}
+
+// AddMusics 新增音乐
+//
+//	@receiver ms
+//	@param ctx
+//	@param music
+//	@return error
+func (ms *MusicService) AddMusics(ctx context.Context, musics []*domain.Music) error {
+	return ms.repo.AddMusics(ctx, musics)
+}
+
+// UpdateMusicInfo 更新音乐信息
+//
+//	@receiver ms
+//	@param ctx
+//	@param music
+//	@return error
+func (ms *MusicService) UpdateMusicInfo(ctx context.Context, music *domain.Music) error {
+	if music == nil {
+		return fmt.Errorf("music is nil")
+	}
+
+	// 判断该音乐是否存在
+	_, err := ms.GetMusicInfoByID(ctx, music.ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrMusicFound
+		}
+		return err
+	}
+
+	// 更新音乐信息
+	if err := ms.repo.UpdateMusicInfo(ctx, music); err != nil {
+		return err
+	}
+
+	return nil
 }

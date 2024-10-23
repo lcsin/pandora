@@ -10,32 +10,39 @@ func _() {
 	var x [1]struct{}
 	_ = x[OK-0]
 	_ = x[Failed - -1]
-	_ = x[BadRequest - -400]
+	_ = x[BadRequest - -4]
+	_ = x[FileUploadFailed - -5]
 	_ = x[UserNotFound - -1001]
-	_ = x[ErrUserExisted - -1002]
+	_ = x[UserExisted - -1002]
+	_ = x[MusicNotFound - -1101]
 }
 
 const (
-	_ErrCode_name_0 = "用户已存在用户不存在或密码错误"
-	_ErrCode_name_1 = "参数错误"
-	_ErrCode_name_2 = "unknown errorok"
+	_ErrCode_name_0 = "音乐不存在"
+	_ErrCode_name_1 = "用户已存在用户不存在或密码错误"
+	_ErrCode_name_2 = "文件上传失败参数错误"
+	_ErrCode_name_3 = "unknown errorok"
 )
 
 var (
-	_ErrCode_index_0 = [...]uint8{0, 15, 45}
-	_ErrCode_index_2 = [...]uint8{0, 13, 15}
+	_ErrCode_index_1 = [...]uint8{0, 15, 45}
+	_ErrCode_index_2 = [...]uint8{0, 18, 30}
+	_ErrCode_index_3 = [...]uint8{0, 13, 15}
 )
 
 func (i ErrCode) String() string {
 	switch {
+	case i == -1101:
+		return _ErrCode_name_0
 	case -1002 <= i && i <= -1001:
 		i -= -1002
-		return _ErrCode_name_0[_ErrCode_index_0[i]:_ErrCode_index_0[i+1]]
-	case i == -400:
-		return _ErrCode_name_1
+		return _ErrCode_name_1[_ErrCode_index_1[i]:_ErrCode_index_1[i+1]]
+	case -5 <= i && i <= -4:
+		i -= -5
+		return _ErrCode_name_2[_ErrCode_index_2[i]:_ErrCode_index_2[i+1]]
 	case -1 <= i && i <= 0:
 		i -= -1
-		return _ErrCode_name_2[_ErrCode_index_2[i]:_ErrCode_index_2[i+1]]
+		return _ErrCode_name_3[_ErrCode_index_3[i]:_ErrCode_index_3[i+1]]
 	default:
 		return "ErrCode(" + strconv.FormatInt(int64(i), 10) + ")"
 	}

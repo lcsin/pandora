@@ -7,6 +7,15 @@ import (
 	"gorm.io/gorm"
 )
 
+// IUserDAO 用户DAO层接口
+type IUserDAO interface {
+	SelectUserByEmail(ctx context.Context, email string) (*User, error)
+
+	Inser(ctx context.Context, user User) error
+
+	UpdateUserByID(ctx context.Context, user User) error
+}
+
 // User 数据库用户表实体映射
 type User struct {
 	ID        int64  `gorm:"primaryKey,autoIncrement"`
@@ -30,15 +39,6 @@ type UserDAO struct {
 // NewUserDAO 用户DAO构造函数
 func NewUserDAO(db *gorm.DB) IUserDAO {
 	return &UserDAO{db: db}
-}
-
-// IUserDAO 用户DAO层接口
-type IUserDAO interface {
-	SelectUserByEmail(ctx context.Context, email string) (*User, error)
-
-	Inser(ctx context.Context, user User) error
-
-	UpdateUserByID(ctx context.Context, user User) error
 }
 
 // SelectUserByEmail 根据邮箱获取用户信息

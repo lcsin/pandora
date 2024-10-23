@@ -105,7 +105,7 @@ func (uh *UserHandler) Register(c *gin.Context) {
 		Password: req.Password,
 	}); err != nil {
 		if errors.Is(err, service.ErrUserExisted) {
-			api.ResponseError(c, message.ErrUserExisted)
+			api.ResponseError(c, message.UserExisted)
 			return
 		}
 		api.ResponseError(c, message.Failed)

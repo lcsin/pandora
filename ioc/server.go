@@ -13,12 +13,13 @@ import (
 //
 //	@param userHandler
 //	@return *gin.Engine
-func InitWebServer(WebHandler *handler.WebHandler ,userHandler *handler.UserHandler, musicHandler *handler.MusicHandler) *gin.Engine {
+func InitWebServer(WebHandler *handler.WebHandler, userHandler *handler.UserHandler, musicHandler *handler.MusicHandler) *gin.Engine {
 	r := gin.Default()
 	// 绑定HTML模板文件
 	r.SetHTMLTemplate(template.Must(template.New("tmpl").ParseFS(web.HTMLFS, "template/*")))
 	// 绑定静态资源文件（将静态资源请求/static/**，映射到./web/static目录下）
 	r.Static("/static", "./web/static")
+	r.StaticFS("/file", gin.Dir("file", true))
 
 	// 健康检查
 	r.GET("/ping", func(c *gin.Context) {
