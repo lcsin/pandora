@@ -22,6 +22,8 @@ var (
 
 // IUserService UserService Interface
 type IUserService interface {
+	GetByID(ctx context.Context, uid int64) (*domain.User, error)
+
 	Login(ctx context.Context, email, password string) (*domain.User, error)
 
 	Regiser(ctx context.Context, user domain.User) error
@@ -37,6 +39,25 @@ type UserService struct {
 //	@param repo
 func NewUserService(repo repository.IUserRepository) IUserService {
 	return &UserService{repo: repo}
+}
+
+// GetByID 根据用户ID获取用户信息
+//
+//	@receiver us
+//	@param ctx
+//	@param uid
+//	@return *domain.User
+//	@return error
+func (us *UserService) GetByID(ctx context.Context, uid int64) (*domain.User, error) {
+	user, err := us.repo.GetByID(ctx, uid)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	return user, nil
 }
 
 // Login 用户登录

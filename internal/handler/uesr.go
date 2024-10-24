@@ -2,7 +2,6 @@ package handler
 
 import (
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -36,6 +35,26 @@ func (uh *UserHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 
 	ug.POST("/login", uh.Login)
 	ug.POST("/register", uh.Register)
+	ug.POST("/info", uh.Info)
+}
+
+// Info 获取用户信息
+//
+//	@receiver uh
+//	@param c
+func (uh *UserHandler) Info(c *gin.Context) {
+	uid := c.GetInt64("uid")
+	user, err := uh.userSrv.GetByID(c, uid)
+	if err != nil {
+		if errors.Is(err, service.ErrUserNotFound) {
+			api.ResponseErrorMessage(c, message.UserNotFound, "用户不存在")
+			return
+		}
+		api.ResponseError(c, message.Failed)
+		return
+	}
+
+	api.ResponseOK(c, user)
 }
 
 // Login 用户登录
@@ -137,7 +156,7 @@ func (uh *UserHandler) setJWTToken(c *gin.Context, uid int64) (*domain.TokenInfo
 		return nil, err
 	}
 	// 请求头添加token
-	c.Header("Authorization", fmt.Sprintf("Bearer %v", accessToken))
+	c.Header("Authorization", accessToken)
 
 	return &domain.TokenInfo{
 		AccessToken:       accessToken,

@@ -45,11 +45,6 @@ func (mh *MusicHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 //	@param c
 func (mh *MusicHandler) GetMusicListByUID(c *gin.Context) {
 	uid := c.GetInt64("uid")
-	if uid == 0 {
-		api.ResponseError(c, message.Unauthorized)
-		return
-	}
-
 	music, err := mh.musicSrv.GetMusicListByUID(c, uid)
 	if err != nil {
 		api.ResponseError(c, message.Failed)

@@ -10,8 +10,12 @@ import (
 
 // IUserRepository 用户Repository层接口
 type IUserRepository interface {
-	Create(ctx context.Context, user domain.User) error
+	GetByID(ctx context.Context, uid int64) (*domain.User, error)
+
 	GetByEmail(ctx context.Context, email string) (*domain.User, error)
+
+	Create(ctx context.Context, user domain.User) error
+
 	UpdateByID(ctx context.Context, user domain.User) error
 }
 
@@ -26,6 +30,29 @@ type UserRepository struct {
 //	@return IUserRepository
 func NewUserRepository(dao dao.IUserDAO) IUserRepository {
 	return &UserRepository{dao: dao}
+}
+
+// GetByID 根据用户ID获取用户信息
+//
+//	@receiver ur
+//	@param ctx
+//	@param uid
+//	@return *domain.User
+//	@return error
+func (ur *UserRepository) GetByID(ctx context.Context, uid int64) (*domain.User, error) {
+	user, err := ur.dao.SelectUserByID(ctx, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.User{
+		ID:          user.ID,
+		Email:       user.Email,
+		Username:    user.Username,
+		Password:    user.Password,
+		CreatedTime: user.CreatedAt.Format(time.DateTime),
+		UpdatedTime: user.CreatedAt.Format(time.DateTime),
+	}, nil
 }
 
 // Create 创建用户
