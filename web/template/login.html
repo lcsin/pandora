@@ -72,6 +72,7 @@
             .then(data => {
                 if (data.code == 0) {
                     alert("登录成功")
+                    localStorage.setItem("token", data.data.accessToken)
                     window.location.href = '/index';
                 } else {
                     alert(data.message)

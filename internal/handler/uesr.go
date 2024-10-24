@@ -2,12 +2,16 @@ package handler
 
 import (
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/lcsin/pandora/api"
 	"github.com/lcsin/pandora/api/message"
 	"github.com/lcsin/pandora/internal/domain"
 	"github.com/lcsin/pandora/internal/service"
+	"github.com/spf13/viper"
 )
 
 // UserHandler user handler
@@ -54,6 +58,7 @@ func (uh *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
+	// 登录
 	user, err := uh.userSrv.Login(c, req.Email, req.Password)
 	if err != nil {
 		if errors.Is(err, service.ErrUserNotFound) {
@@ -64,13 +69,14 @@ func (uh *UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	api.ResponseOK(c, domain.User{
-		ID:          user.ID,
-		Email:       user.Email,
-		Username:    user.Username,
-		CreatedTime: user.CreatedTime,
-		UpdatedTime: user.UpdatedTime,
-	})
+	// 设置JWT
+	tokenInfo, err := uh.setJWTToken(c, user.ID)
+	if err != nil {
+		api.ResponseError(c, message.Failed)
+		return
+	}
+
+	api.ResponseOK(c, tokenInfo)
 }
 
 // Register 用户注册
@@ -113,4 +119,28 @@ func (uh *UserHandler) Register(c *gin.Context) {
 	}
 
 	api.ResponseOK(c, nil)
+}
+
+// 设置JWT Token
+func (uh *UserHandler) setJWTToken(c *gin.Context, uid int64) (*domain.TokenInfo, error) {
+	accessTokenExpire := time.Now().Add(time.Hour * 24 * 7)
+	claims := domain.Claims{
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(accessTokenExpire),
+		},
+		UID: uid,
+	}
+
+	accessToken, err := jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(viper.GetString("jwt_secret")))
+	if err != nil {
+		api.ResponseError(c, message.Failed)
+		return nil, err
+	}
+	// 请求头添加token
+	c.Header("Authorization", fmt.Sprintf("Bearer %v", accessToken))
+
+	return &domain.TokenInfo{
+		AccessToken:       accessToken,
+		AccessTokenExpire: accessTokenExpire.Unix(),
+	}, nil
 }

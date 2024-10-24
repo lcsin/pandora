@@ -44,21 +44,13 @@ func (mh *MusicHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 //	@receiver mh
 //	@param c
 func (mh *MusicHandler) GetMusicListByUID(c *gin.Context) {
-	type Req struct {
-		UID int64 `json:"uid"`
-	}
-
-	var req Req
-	if err := c.ShouldBind(&req); err != nil {
-		api.ResponseError(c, message.BadRequest)
-		return
-	}
-	if req.UID == 0 {
-		api.ResponseErrorMessage(c, message.BadRequest, "用户ID不能为空")
+	uid := c.GetInt64("uid")
+	if uid == 0 {
+		api.ResponseError(c, message.Unauthorized)
 		return
 	}
 
-	music, err := mh.musicSrv.GetMusicListByUID(c, req.UID)
+	music, err := mh.musicSrv.GetMusicListByUID(c, uid)
 	if err != nil {
 		api.ResponseError(c, message.Failed)
 		return
@@ -128,7 +120,7 @@ func (mh *MusicHandler) UploadMusic(c *gin.Context) {
 		}
 
 		musics = append(musics, &domain.Music{
-			UID:    2,
+			UID:    c.GetInt64("uid"),
 			Name:   name,
 			Author: author,
 			URL:    fp,

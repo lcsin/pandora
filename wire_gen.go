@@ -31,6 +31,7 @@ func InitApp() *gin.Engine {
 	iUserService := service.NewUserService(iUserRepository)
 	userHandler := handler.NewUserHandler(iUserService)
 	musicHandler := handler.NewMusicHandler(iMusicService)
-	engine := ioc.InitWebServer(webHandler, userHandler, musicHandler)
+	v := ioc.InitMiddlewares()
+	engine := ioc.InitWebServer(webHandler, userHandler, musicHandler, v)
 	return engine
 }

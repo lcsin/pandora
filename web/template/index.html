@@ -253,13 +253,13 @@
         let playlist = []
         getMusicList()
         function getMusicList() {
-            const uid = 2
+            const token = localStorage.getItem("token")
             fetch('http://localhost:8080/api/v1/music/list', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    "Authorization": token,
                 },
-                body: JSON.stringify({ uid })
             })
                 .then(response => response.json())
                 .then(data => {
