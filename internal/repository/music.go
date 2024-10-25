@@ -13,7 +13,7 @@ type IMusicRepository interface {
 
 	GetMusicListByUID(ctx context.Context, uid int64) ([]*domain.Music, error)
 
-	GetMusicListByNameOrAuthor(ctx context.Context, name, author string) ([]*domain.Music, error)
+	GetMyMusicListByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*domain.Music, error)
 
 	AddMusics(ctx context.Context, musics []*domain.Music) error
 
@@ -81,7 +81,7 @@ func (mr *MusicRpository) GetMusicListByUID(ctx context.Context, uid int64) ([]*
 	return music, nil
 }
 
-// GetMusicListByNameOrAuthor 根据歌名或作者获取音乐列表
+// GetMyMusicListByNameOrAuthor 根据歌名或作者获取音乐列表
 //
 //	@receiver mr
 //	@param ctx
@@ -89,8 +89,8 @@ func (mr *MusicRpository) GetMusicListByUID(ctx context.Context, uid int64) ([]*
 //	@param author
 //	@return []*domain.Music
 //	@return error
-func (mr *MusicRpository) GetMusicListByNameOrAuthor(ctx context.Context, name string, author string) ([]*domain.Music, error) {
-	musicList, err := mr.dao.SelectMusicByNameOrAuthor(ctx, name, author)
+func (mr *MusicRpository) GetMyMusicListByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*domain.Music, error) {
+	musicList, err := mr.dao.SelectMyMusicByNameOrAuthor(ctx, uid, query)
 	if err != nil {
 		return nil, err
 	}

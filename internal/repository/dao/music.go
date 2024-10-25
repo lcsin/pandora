@@ -12,7 +12,7 @@ type IMusicDAO interface {
 
 	SelectMusicListByUID(ctx context.Context, uid int64) ([]*Music, error)
 
-	SelectMusicByNameOrAuthor(ctx context.Context, name, author string) ([]*Music, error)
+	SelectMyMusicByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*Music, error)
 
 	InsertMusics(ctx context.Context, musics []Music) error
 
@@ -80,7 +80,7 @@ func (m *MusicDAO) SelectMusicListByUID(ctx context.Context, uid int64) ([]*Musi
 	return music, nil
 }
 
-// SelectMusicByNameOrAuthor 根据歌名或作者名获取音乐列表
+// SelectMyMusicByNameOrAuthor 根据歌名或作者名获取音乐列表
 //
 //	@receiver m
 //	@param ctx
@@ -88,11 +88,21 @@ func (m *MusicDAO) SelectMusicListByUID(ctx context.Context, uid int64) ([]*Musi
 //	@param author
 //	@return []*Music
 //	@return error
-func (m *MusicDAO) SelectMusicByNameOrAuthor(ctx context.Context, name, author string) ([]*Music, error) {
+func (m *MusicDAO) SelectMyMusicByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*Music, error) {
 	var music []*Music
-	if err := m.db.Where("`name` = ? or author = ?", name, author).Find(&music).Error; err != nil {
+
+	queryScope := func(db *gorm.DB) *gorm.DB {
+		db = db.Where("uid = ?", uid)
+		if len(query) > 0 {
+			db = db.Where("`name` = ? or author = ?", query, query)
+		}
+		return db
+	}
+
+	if err := m.db.Scopes(queryScope).Find(&music).Error; err != nil {
 		return nil, err
 	}
+
 	return music, nil
 }
 

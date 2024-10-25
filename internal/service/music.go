@@ -21,7 +21,7 @@ type IMusicService interface {
 
 	GetMusicListByUID(ctx context.Context, uid int64) ([]*domain.Music, error)
 
-	GetMusicListByNameOrAuthor(ctx context.Context, name, author string) ([]*domain.Music, error)
+	GetMyMusicListByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*domain.Music, error)
 
 	AddMusics(ctx context.Context, musics []*domain.Music) error
 
@@ -63,7 +63,7 @@ func (ms *MusicService) GetMusicListByUID(ctx context.Context, uid int64) ([]*do
 	return ms.repo.GetMusicListByUID(ctx, uid)
 }
 
-// GetMusicListByNameOrAuthor 根据歌名或作者获取音乐列表
+// GetMyMusicListByNameOrAuthor 根据歌名或作者获取音乐列表
 //
 //	@receiver ms
 //	@param ctx
@@ -71,8 +71,8 @@ func (ms *MusicService) GetMusicListByUID(ctx context.Context, uid int64) ([]*do
 //	@param author
 //	@return []*domain.Music
 //	@return error
-func (ms *MusicService) GetMusicListByNameOrAuthor(ctx context.Context, name, author string) ([]*domain.Music, error) {
-	return ms.repo.GetMusicListByNameOrAuthor(ctx, name, author)
+func (ms *MusicService) GetMyMusicListByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*domain.Music, error) {
+	return ms.repo.GetMyMusicListByNameOrAuthor(ctx, uid, query)
 }
 
 // AddMusics 新增音乐

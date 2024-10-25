@@ -34,7 +34,7 @@ func (mh *MusicHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 	mg := v1.Group("/music")
 
 	mg.POST("/list", mh.GetMusicListByUID)
-	mg.POST("/search", mh.GetMusicListByNameOrAuthor)
+	mg.POST("/search", mh.SearchMyMusic)
 	mg.POST("/upload", mh.UploadMusic)
 	mg.POST("/update", mh.UpdateMusic)
 }
@@ -54,11 +54,11 @@ func (mh *MusicHandler) GetMusicListByUID(c *gin.Context) {
 	api.ResponseOK(c, music)
 }
 
-// GetMusicListByNameOrAuthor 根据歌名或作者获取音乐列表
+// SearchMyMusic 根据歌名或作者获取音乐列表
 //
 //	@receiver mh
 //	@param c
-func (mh *MusicHandler) GetMusicListByNameOrAuthor(c *gin.Context) {
+func (mh *MusicHandler) SearchMyMusic(c *gin.Context) {
 	type Req struct {
 		Query string `json:"query"`
 	}
@@ -69,7 +69,7 @@ func (mh *MusicHandler) GetMusicListByNameOrAuthor(c *gin.Context) {
 		return
 	}
 
-	music, err := mh.musicSrv.GetMusicListByNameOrAuthor(c, req.Query, req.Query)
+	music, err := mh.musicSrv.GetMyMusicListByNameOrAuthor(c, c.GetInt64("uid"), req.Query)
 	if err != nil {
 		api.ResponseError(c, message.Failed)
 		return

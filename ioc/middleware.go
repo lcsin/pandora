@@ -10,6 +10,8 @@ import (
 //	@return []gin.HandlerFunc
 func InitMiddlewares() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
+		// 跨域中间件
+		middleware.CORS(),
 		// JWT中间件
 		middleware.NewJWTBuilder().
 			Statics("/static", "/file"). // 放行静态资源
@@ -17,7 +19,5 @@ func InitMiddlewares() []gin.HandlerFunc {
 				"/login", "/register", "/index", // 放行页面路由
 				"/ping", "/api/v1/users/login", "/api/v1/users/register", // 放行后端请求
 			).Build(),
-		// 跨域中间件
-		middleware.CORS(),
 	}
 }
