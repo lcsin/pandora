@@ -108,12 +108,15 @@ func (mh *MusicHandler) UploadMusic(c *gin.Context) {
 			author = strings.TrimSpace(names[1])
 		}
 
-		fp := path.Join("file", "music", f.Filename)
+		fp := path.Join("music", f.Filename)
 		if err := c.SaveUploadedFile(f, fp); err != nil {
 			api.ResponseError(c, message.FileUploadFailed)
 			return
 		}
 
+		if len(name) == 0 {
+			name = strings.TrimSuffix(f.Filename, path.Ext(f.Filename))
+		}
 		musics = append(musics, &domain.Music{
 			UID:    c.GetInt64("uid"),
 			Name:   name,
