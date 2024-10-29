@@ -17,6 +17,8 @@ type IMusicDAO interface {
 	InsertMusics(ctx context.Context, musics []Music) error
 
 	UpdateMusicInfo(ctx context.Context, music Music) error
+
+	DeleteMusicByID(ctx context.Context, ID int64) error
 }
 
 // Music 数据库音乐表实体映射
@@ -126,11 +128,18 @@ func (m *MusicDAO) InsertMusics(ctx context.Context, musics []Music) error {
 //	@param music
 //	@return error
 func (m *MusicDAO) UpdateMusicInfo(ctx context.Context, music Music) error {
-	if err := m.db.Model(&Music{}).Where("id = ?", music.ID).Updates(map[string]interface{}{
+	return m.db.Model(&Music{}).Where("id = ?", music.ID).Updates(map[string]interface{}{
 		"name":   music.Name,
 		"author": music.Author,
-	}).Error; err != nil {
-		return err
-	}
-	return nil
+	}).Error
+}
+
+// DeleteMusicByID 根据ID删除音乐
+//
+//	@receiver m
+//	@param ctx
+//	@param ID
+//	@return error
+func (m *MusicDAO) DeleteMusicByID(ctx context.Context, ID int64) error {
+	return m.db.Where("id = ?", ID).Delete(&Music{}).Error
 }

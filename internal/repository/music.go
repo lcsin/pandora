@@ -18,6 +18,8 @@ type IMusicRepository interface {
 	AddMusics(ctx context.Context, musics []*domain.Music) error
 
 	UpdateMusicInfo(ctx context.Context, music *domain.Music) error
+
+	DeleteMusicByID(ctx context.Context, ID int64) error
 }
 
 // MusicRpository music repository
@@ -142,4 +144,14 @@ func (mr *MusicRpository) UpdateMusicInfo(ctx context.Context, music *domain.Mus
 		Name:   music.Name,
 		Author: music.Author,
 	})
+}
+
+// DeleteMusicByID 根据ID删除音乐
+//
+//	@receiver mr
+//	@param ctx
+//	@param ID
+//	@return error
+func (mr *MusicRpository) DeleteMusicByID(ctx context.Context, ID int64) error {
+	return mr.dao.DeleteMusicByID(ctx, ID)
 }

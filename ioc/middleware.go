@@ -13,11 +13,11 @@ func InitMiddlewares() []gin.HandlerFunc {
 		// 跨域中间件
 		middleware.CORS(),
 		// JWT中间件
-		// middleware.NewJWTBuilder().
-		// 	Statics("/assets", "/music"). // 放行静态资源
-		// 	Ignores(
-		// 		"/", "/index", "/login", "/register", // 放行页面路由
-		// 		"/ping", "/api/v1/users/login", "/api/v1/users/register", // 放行后端请求
-		// 	).Build(),
+		middleware.NewJWTBuilder().
+			Statics("/assets", "/music"). // 放行静态资源
+			Ignores(
+				"/", "/index", "/login", "/register", // 放行页面路由
+				"/ping", "/api/v1/users/login", "/api/v1/users/register", // 放行后端请求
+			).Build(),
 	}
 }

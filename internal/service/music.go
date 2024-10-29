@@ -26,6 +26,8 @@ type IMusicService interface {
 	AddMusics(ctx context.Context, musics []*domain.Music) error
 
 	UpdateMusicInfo(ctx context.Context, music *domain.Music) error
+
+	DeleteMusicByID(ctx context.Context, ID int64) error
 }
 
 // MusicService music service
@@ -111,4 +113,23 @@ func (ms *MusicService) UpdateMusicInfo(ctx context.Context, music *domain.Music
 	}
 
 	return nil
+}
+
+// DeleteMusicByID 根据ID删除音乐
+//
+//	@receiver ms
+//	@param ctx
+//	@param ID
+//	@return error
+func (ms *MusicService) DeleteMusicByID(ctx context.Context, ID int64) error {
+	// 判断该音乐是否存在
+	_, err := ms.GetMusicInfoByID(ctx, ID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrMusicFound
+		}
+		return err
+	}
+
+	return ms.repo.DeleteMusicByID(ctx, ID)
 }

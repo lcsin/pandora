@@ -37,6 +37,7 @@ func (mh *MusicHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 	mg.POST("/search", mh.SearchMyMusic)
 	mg.POST("/upload", mh.UploadMusic)
 	mg.POST("/update", mh.UpdateMusic)
+	mg.POST("/delete", mh.DeleteMusic)
 }
 
 // GetMusicListByUID 根据用户id获取音乐列表
@@ -155,6 +156,33 @@ func (mh *MusicHandler) UpdateMusic(c *gin.Context) {
 		Name:   req.Name,
 		Author: req.Author,
 	}); err != nil {
+		if errors.Is(err, service.ErrMusicFound) {
+			api.ResponseError(c, message.MusicNotFound)
+			return
+		}
+		api.ResponseError(c, message.Failed)
+		return
+	}
+
+	api.ResponseOK(c, nil)
+}
+
+// DeleteMusic 删除音乐
+//
+//	@receiver mh
+//	@param c
+func (mh *MusicHandler) DeleteMusic(c *gin.Context) {
+	type Req struct {
+		ID int64 `json:"id"`
+	}
+
+	var req Req
+	if err := c.ShouldBind(&req); err != nil {
+		api.ResponseError(c, message.BadRequest)
+		return
+	}
+
+	if err := mh.musicSrv.DeleteMusicByID(c, req.ID); err != nil {
 		if errors.Is(err, service.ErrMusicFound) {
 			api.ResponseError(c, message.MusicNotFound)
 			return
