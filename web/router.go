@@ -21,7 +21,7 @@ func RegisterRoutes(r gin.IRouter) {
 //
 //	@param c
 func Index(c *gin.Context) {
-	tmpl := template.Must(template.New("tmpl").Parse(HTML))
+	tmpl := template.Must(template.New("tmpl").Parse(IndexHTML))
 	var buf bytes.Buffer
 	tmpl.Execute(&buf, nil)
 
