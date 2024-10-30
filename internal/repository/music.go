@@ -11,9 +11,9 @@ import (
 type IMusicRepository interface {
 	GetMusicInfoByID(ctx context.Context, ID int64) (*domain.Music, error)
 
-	GetMusicListByUID(ctx context.Context, uid int64) ([]*domain.Music, error)
+	GetMusicList(ctx context.Context) ([]*domain.Music, error)
 
-	GetMyMusicListByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*domain.Music, error)
+	GetMyMusicListByNameOrAuthor(ctx context.Context, query string) ([]*domain.Music, error)
 
 	AddMusics(ctx context.Context, musics []*domain.Music) error
 
@@ -48,23 +48,21 @@ func (mr *MusicRpository) GetMusicInfoByID(ctx context.Context, ID int64) (*doma
 
 	return &domain.Music{
 		ID:     music.ID,
-		UID:    music.UID,
 		Name:   music.Name,
 		Author: music.Author,
-		Time:   music.Time,
 		URL:    music.URL,
 	}, nil
 }
 
-// GetMusicListByUID 根据用户id获取音乐列表
+// GetMusicList 获取音乐列表
 //
 //	@receiver mr
 //	@param ctx
 //	@param uid
 //	@return []*domain.Music
 //	@return error
-func (mr *MusicRpository) GetMusicListByUID(ctx context.Context, uid int64) ([]*domain.Music, error) {
-	musicList, err := mr.dao.SelectMusicListByUID(ctx, uid)
+func (mr *MusicRpository) GetMusicList(ctx context.Context) ([]*domain.Music, error) {
+	musicList, err := mr.dao.SelectMusicList(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +74,6 @@ func (mr *MusicRpository) GetMusicListByUID(ctx context.Context, uid int64) ([]*
 			Name:   v.Name,
 			Author: v.Author,
 			URL:    v.URL,
-			Time:   v.Time,
 		})
 	}
 
@@ -91,8 +88,8 @@ func (mr *MusicRpository) GetMusicListByUID(ctx context.Context, uid int64) ([]*
 //	@param author
 //	@return []*domain.Music
 //	@return error
-func (mr *MusicRpository) GetMyMusicListByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*domain.Music, error) {
-	musicList, err := mr.dao.SelectMyMusicByNameOrAuthor(ctx, uid, query)
+func (mr *MusicRpository) GetMyMusicListByNameOrAuthor(ctx context.Context, query string) ([]*domain.Music, error) {
+	musicList, err := mr.dao.SelectMyMusicByNameOrAuthor(ctx, query)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +101,6 @@ func (mr *MusicRpository) GetMyMusicListByNameOrAuthor(ctx context.Context, uid 
 			Name:   v.Name,
 			Author: v.Author,
 			URL:    v.URL,
-			Time:   v.Time,
 		})
 	}
 
@@ -121,11 +117,9 @@ func (mr *MusicRpository) AddMusics(ctx context.Context, musics []*domain.Music)
 	list := make([]dao.Music, 0, len(musics))
 	for _, v := range musics {
 		list = append(list, dao.Music{
-			UID:    v.UID,
 			Name:   v.Name,
 			Author: v.Author,
 			URL:    v.URL,
-			Time:   v.Time,
 		})
 	}
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/lcsin/pandora/internal/domain"
 	"github.com/lcsin/pandora/internal/repository"
@@ -19,9 +20,9 @@ var (
 type IMusicService interface {
 	GetMusicInfoByID(ctx context.Context, ID int64) (*domain.Music, error)
 
-	GetMusicListByUID(ctx context.Context, uid int64) ([]*domain.Music, error)
+	GetMusicList(ctx context.Context) ([]*domain.Music, error)
 
-	GetMyMusicListByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*domain.Music, error)
+	GetMyMusicListByNameOrAuthor(ctx context.Context, query string) ([]*domain.Music, error)
 
 	AddMusics(ctx context.Context, musics []*domain.Music) error
 
@@ -54,15 +55,15 @@ func (ms *MusicService) GetMusicInfoByID(ctx context.Context, ID int64) (*domain
 	return ms.repo.GetMusicInfoByID(ctx, ID)
 }
 
-// GetMusicListByUID 根据用户id获取音乐列表
+// GetMusicList 获取音乐列表
 //
 //	@receiver ms
 //	@param ctx
 //	@param uid
 //	@return []*domain.Music
 //	@return error
-func (ms *MusicService) GetMusicListByUID(ctx context.Context, uid int64) ([]*domain.Music, error) {
-	return ms.repo.GetMusicListByUID(ctx, uid)
+func (ms *MusicService) GetMusicList(ctx context.Context) ([]*domain.Music, error) {
+	return ms.repo.GetMusicList(ctx)
 }
 
 // GetMyMusicListByNameOrAuthor 根据歌名或作者获取音乐列表
@@ -73,8 +74,8 @@ func (ms *MusicService) GetMusicListByUID(ctx context.Context, uid int64) ([]*do
 //	@param author
 //	@return []*domain.Music
 //	@return error
-func (ms *MusicService) GetMyMusicListByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*domain.Music, error) {
-	return ms.repo.GetMyMusicListByNameOrAuthor(ctx, uid, query)
+func (ms *MusicService) GetMyMusicListByNameOrAuthor(ctx context.Context, query string) ([]*domain.Music, error) {
+	return ms.repo.GetMyMusicListByNameOrAuthor(ctx, query)
 }
 
 // AddMusics 新增音乐
@@ -123,7 +124,7 @@ func (ms *MusicService) UpdateMusicInfo(ctx context.Context, music *domain.Music
 //	@return error
 func (ms *MusicService) DeleteMusicByID(ctx context.Context, ID int64) error {
 	// 判断该音乐是否存在
-	_, err := ms.GetMusicInfoByID(ctx, ID)
+	music, err := ms.GetMusicInfoByID(ctx, ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrMusicFound
@@ -131,5 +132,11 @@ func (ms *MusicService) DeleteMusicByID(ctx context.Context, ID int64) error {
 		return err
 	}
 
-	return ms.repo.DeleteMusicByID(ctx, ID)
+	if err := ms.repo.DeleteMusicByID(ctx, ID); err != nil {
+		return err
+	}
+	// 删除本地文件
+	_ = os.Remove(music.URL)
+
+	return nil
 }

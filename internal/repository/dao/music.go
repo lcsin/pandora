@@ -10,9 +10,9 @@ import (
 type IMusicDAO interface {
 	SelectMusicInfoByID(ctx context.Context, ID int64) (*Music, error)
 
-	SelectMusicListByUID(ctx context.Context, uid int64) ([]*Music, error)
+	SelectMusicList(ctx context.Context) ([]*Music, error)
 
-	SelectMyMusicByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*Music, error)
+	SelectMyMusicByNameOrAuthor(ctx context.Context, query string) ([]*Music, error)
 
 	InsertMusics(ctx context.Context, musics []Music) error
 
@@ -24,11 +24,9 @@ type IMusicDAO interface {
 // Music 数据库音乐表实体映射
 type Music struct {
 	ID     int64 `gorm:"primaryKey,authIncrement"`
-	UID    int64
 	Name   string
 	Author string
 	URL    string
-	Time   float64
 }
 
 // TableName 数据库音乐表表名映射
@@ -67,16 +65,16 @@ func (m *MusicDAO) SelectMusicInfoByID(ctx context.Context, ID int64) (*Music, e
 	return &music, nil
 }
 
-// SelectMusicListByUID 根据用户ID获取音乐列表
+// SelectMusicList 获取音乐列表
 //
 //	@receiver m
 //	@param ctx
 //	@param id
 //	@return []*Music
 //	@return error
-func (m *MusicDAO) SelectMusicListByUID(ctx context.Context, uid int64) ([]*Music, error) {
+func (m *MusicDAO) SelectMusicList(ctx context.Context) ([]*Music, error) {
 	var music []*Music
-	if err := m.db.Where("uid = ?", uid).Find(&music).Error; err != nil {
+	if err := m.db.Find(&music).Error; err != nil {
 		return nil, err
 	}
 	return music, nil
@@ -90,11 +88,11 @@ func (m *MusicDAO) SelectMusicListByUID(ctx context.Context, uid int64) ([]*Musi
 //	@param author
 //	@return []*Music
 //	@return error
-func (m *MusicDAO) SelectMyMusicByNameOrAuthor(ctx context.Context, uid int64, query string) ([]*Music, error) {
+func (m *MusicDAO) SelectMyMusicByNameOrAuthor(ctx context.Context, query string) ([]*Music, error) {
 	var music []*Music
 
 	queryScope := func(db *gorm.DB) *gorm.DB {
-		db = db.Where("uid = ?", uid)
+		// db = db.Where("uid = ?", uid)
 		if len(query) > 0 {
 			db = db.Where("`name` = ? or author = ?", query, query)
 		}

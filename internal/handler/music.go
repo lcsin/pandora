@@ -33,20 +33,19 @@ func NewMusicHandler(musicSrv service.IMusicService) *MusicHandler {
 func (mh *MusicHandler) RegisterRoutes(v1 *gin.RouterGroup) {
 	mg := v1.Group("/music")
 
-	mg.POST("/list", mh.GetMusicListByUID)
+	mg.POST("/list", mh.GetMusicList)
 	mg.POST("/search", mh.SearchMyMusic)
 	mg.POST("/upload", mh.UploadMusic)
 	mg.POST("/update", mh.UpdateMusic)
 	mg.POST("/delete", mh.DeleteMusic)
 }
 
-// GetMusicListByUID 根据用户id获取音乐列表
+// GetMusicList 获取音乐列表
 //
 //	@receiver mh
 //	@param c
-func (mh *MusicHandler) GetMusicListByUID(c *gin.Context) {
-	uid := c.GetInt64("uid")
-	music, err := mh.musicSrv.GetMusicListByUID(c, uid)
+func (mh *MusicHandler) GetMusicList(c *gin.Context) {
+	music, err := mh.musicSrv.GetMusicList(c)
 	if err != nil {
 		api.ResponseError(c, message.Failed)
 		return
@@ -70,7 +69,7 @@ func (mh *MusicHandler) SearchMyMusic(c *gin.Context) {
 		return
 	}
 
-	music, err := mh.musicSrv.GetMyMusicListByNameOrAuthor(c, c.GetInt64("uid"), req.Query)
+	music, err := mh.musicSrv.GetMyMusicListByNameOrAuthor(c, req.Query)
 	if err != nil {
 		api.ResponseError(c, message.Failed)
 		return
@@ -119,7 +118,6 @@ func (mh *MusicHandler) UploadMusic(c *gin.Context) {
 			name = strings.TrimSuffix(f.Filename, path.Ext(f.Filename))
 		}
 		musics = append(musics, &domain.Music{
-			UID:    c.GetInt64("uid"),
 			Name:   name,
 			Author: author,
 			URL:    fp,

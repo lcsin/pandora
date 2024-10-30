@@ -1,6 +1,8 @@
 package web
 
-import "embed"
+import (
+	"embed"
+)
 
 // HTML 嵌入html文件
 // 使用embed的好处是，打包成二进制文件后，这些静态资源文件会一并打包进去
@@ -10,5 +12,6 @@ import "embed"
 var HTML string
 
 // StaticFS 嵌入静态资源文件
+//
 //go:embed assets/*
 var StaticFS embed.FS
