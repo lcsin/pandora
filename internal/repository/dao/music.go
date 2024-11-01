@@ -37,17 +37,17 @@ func (m *Music) TableName() string {
 	return "music_tbl"
 }
 
-// MusicDAO music dao
-type MusicDAO struct {
+// MusicMySQL music dao
+type MusicMySQL struct {
 	db *gorm.DB
 }
 
-// NewMusicDAO 音乐DAO构造函数
+// NewMusicMySQL 音乐DAO构造函数
 //
 //	@param db
 //	@return IMusicDAO
-func NewMusicDAO(db *gorm.DB) IMusicDAO {
-	return &MusicDAO{db: db}
+func NewMusicMySQL(db *gorm.DB) IMusicDAO {
+	return &MusicMySQL{db: db}
 }
 
 // SelectMusicInfoByID 根据ID获取音乐信息
@@ -57,7 +57,7 @@ func NewMusicDAO(db *gorm.DB) IMusicDAO {
 //	@param ID
 //	@return *Music
 //	@return error
-func (m *MusicDAO) SelectMusicInfoByID(ctx context.Context, ID int64) (*Music, error) {
+func (m *MusicMySQL) SelectMusicInfoByID(ctx context.Context, ID int64) (*Music, error) {
 	var music Music
 	if err := m.db.Where("id = ?", ID).First(&music).Error; err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func (m *MusicDAO) SelectMusicInfoByID(ctx context.Context, ID int64) (*Music, e
 //	@param id
 //	@return []*Music
 //	@return error
-func (m *MusicDAO) SelectMusicList(ctx context.Context) ([]*Music, error) {
+func (m *MusicMySQL) SelectMusicList(ctx context.Context) ([]*Music, error) {
 	var music []*Music
 	if err := m.db.Find(&music).Error; err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (m *MusicDAO) SelectMusicList(ctx context.Context) ([]*Music, error) {
 //	@param author
 //	@return []*Music
 //	@return error
-func (m *MusicDAO) SelectMyMusicByNameOrAuthor(ctx context.Context, query string) ([]*Music, error) {
+func (m *MusicMySQL) SelectMyMusicByNameOrAuthor(ctx context.Context, query string) ([]*Music, error) {
 	var music []*Music
 
 	queryScope := func(db *gorm.DB) *gorm.DB {
@@ -112,7 +112,7 @@ func (m *MusicDAO) SelectMyMusicByNameOrAuthor(ctx context.Context, query string
 //	@param ctx
 //	@param music
 //	@return error
-func (m *MusicDAO) InsertMusics(ctx context.Context, musics []Music) error {
+func (m *MusicMySQL) InsertMusics(ctx context.Context, musics []Music) error {
 	if len(musics) > 0 {
 		return m.db.Create(&musics).Error
 	}
@@ -125,7 +125,7 @@ func (m *MusicDAO) InsertMusics(ctx context.Context, musics []Music) error {
 //	@param ctx
 //	@param music
 //	@return error
-func (m *MusicDAO) UpdateMusicInfo(ctx context.Context, music Music) error {
+func (m *MusicMySQL) UpdateMusicInfo(ctx context.Context, music Music) error {
 	return m.db.Model(&Music{}).Where("id = ?", music.ID).Updates(map[string]interface{}{
 		"name":   music.Name,
 		"author": music.Author,
@@ -138,6 +138,6 @@ func (m *MusicDAO) UpdateMusicInfo(ctx context.Context, music Music) error {
 //	@param ctx
 //	@param ID
 //	@return error
-func (m *MusicDAO) DeleteMusicByID(ctx context.Context, ID int64) error {
+func (m *MusicMySQL) DeleteMusicByID(ctx context.Context, ID int64) error {
 	return m.db.Where("id = ?", ID).Delete(&Music{}).Error
 }

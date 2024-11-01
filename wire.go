@@ -18,11 +18,11 @@ import (
 func InitApp() *gin.Engine {
 	wire.Build(
 		// 数据库、web服务
-		ioc.InitDB, ioc.InitWebServer, ioc.InitMiddlewares,
+		ioc.InitSQLLite, ioc.InitWebServer, ioc.InitMiddlewares,
 		// 用户服务
-		dao.NewUserDAO, repository.NewUserRepository, service.NewUserService, handler.NewUserHandler,
+		// dao.NewUserDAO, repository.NewUserRepository, service.NewUserService, handler.NewUserHandler,
 		// 音乐服务
-		dao.NewMusicDAO, repository.NewMusicRepository, service.NewMusicService, handler.NewMusicHandler,
+		dao.NewMusicMySQL, repository.NewMusicRepository, service.NewMusicService, handler.NewMusicHandler,
 	)
 
 	return gin.Default()

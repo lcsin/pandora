@@ -11,8 +11,7 @@ import (
 //
 //	@param userHandler
 //	@return *gin.Engine
-func InitWebServer(userHandler *handler.UserHandler,
-	musicHandler *handler.MusicHandler, middlewares []gin.HandlerFunc) *gin.Engine {
+func InitWebServer(musicHandler *handler.MusicHandler, middlewares []gin.HandlerFunc) *gin.Engine {
 	r := gin.Default()
 	r.Use(middlewares...)
 	// 绑定静态资源请求（将静态资源的请求/assets/**，映射到./web/static目录下）
@@ -29,7 +28,7 @@ func InitWebServer(userHandler *handler.UserHandler,
 
 	// 后端接口
 	v1 := r.Group("/api/v1")
-	userHandler.RegisterRoutes(v1)  // 注册用户hanlder
+	// userHandler.RegisterRoutes(v1)  // 注册用户hanlder
 	musicHandler.RegisterRoutes(v1) // 注册音乐hanlder
 
 	return r
