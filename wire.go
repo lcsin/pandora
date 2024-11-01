@@ -18,7 +18,7 @@ import (
 func InitApp() *gin.Engine {
 	wire.Build(
 		// 数据库、web服务
-		ioc.InitSQLLite, ioc.InitWebServer, ioc.InitMiddlewares,
+		ioc.InitSQLite, ioc.InitWebServer, ioc.InitMiddlewares,
 		// 用户服务
 		// dao.NewUserDAO, repository.NewUserRepository, service.NewUserService, handler.NewUserHandler,
 		// 音乐服务

@@ -21,7 +21,7 @@ import (
 //
 //	@return *gin.Engine
 func InitApp() *gin.Engine {
-	db := ioc.InitSQLLite()
+	db := ioc.InitSQLite()
 	iMusicDAO := dao.NewMusicMySQL(db)
 	iMusicRepository := repository.NewMusicRepository(iMusicDAO)
 	iMusicService := service.NewMusicService(iMusicRepository)

@@ -35,8 +35,8 @@ func InitMySQL() *gorm.DB {
 	return db
 }
 
-// InitSQLLite 初始化sqllite
-func InitSQLLite() *gorm.DB {
+// InitSQLite 初始化sqllite
+func InitSQLite() *gorm.DB {
 	db, err := gorm.Open(sqlite.Open("pandora.db"), &gorm.Config{
 		Logger: logger.New(
 			log.New(os.Stdout, "\r\n", log.LstdFlags),
